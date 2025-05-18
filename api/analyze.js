@@ -47,7 +47,7 @@ export default async function handler(req) {
         const imageData = Uint8Array.from(atob(base64Image), c => c.charCodeAt(0));
 
         // Get the Gemini Pro Vision model with correct model name
-        const model = genAI.getGenerativeModel({ model: "gemini-pro-vision-1.0" });
+        const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
 
         const result = await model.generateContent([
             {

@@ -28,7 +28,7 @@ export default async function handler(req) {
         }
 
         // Get the Gemini Pro model with correct model name
-        const model = genAI.getGenerativeModel({ model: "gemini-pro-1.0" });
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
         try {
             // Simple test call to Gemini
