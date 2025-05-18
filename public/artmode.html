@@ -26,13 +26,13 @@
       transform: scaleX(-1);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     }
-    /* Artmode-specific layout fixes */
+    /* Artmode-specific layout */
     .artmode-page .split-view {
       display: flex;
       justify-content: center;
-      gap: 2rem;
+      gap: 2rem; /* Space between boxes */
       width: 100%;
-      max-width: 1600px; /* Adjust as needed */
+      max-width: 1600px;
       margin: 0 auto;
       padding: 20px;
     }
@@ -40,22 +40,29 @@
     .artmode-page .canvas-section,
     .artmode-page .result-section {
       flex: 1;
-      min-width: 0; /* Prevent flex overflow */
+      min-width: 0; /* Prevent overflow */
+      max-width: calc(50% - 1rem); /* Half width minus half gap */
       background: white;
       border-radius: 10px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       padding: 20px;
-      display: flex;
-      flex-direction: column;
-      height: 600px; /* Fixed equal height */
+      height: 600px;
+      overflow: hidden; /* Prevent content spill */
     }
     
-    .artmode-page #drawingCanvas,
+    .artmode-page #drawingCanvas {
+      width: 100% !important;
+      height: 100% !important;
+      background: white;
+    }
+    
     .artmode-page #aiArtDisplay {
-      flex: 1;
       width: 100%;
       height: 100%;
       background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     
     .artmode-page #webcam {
