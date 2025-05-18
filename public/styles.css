@@ -330,33 +330,45 @@ header p {
 
 /* AI Response Styles */
 .ai-response {
-  position: fixed;
-  bottom: 30px;
-  left: 50%;
-  transform: translateX(-50%);
-  background-color: rgba(255, 255, 255, 0.95);
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-  backdrop-filter: blur(5px);
-  text-align: center;
-  min-width: 300px;
-  max-width: 600px;
   display: none;
+  margin-top: 20px;
+  padding: 20px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .ai-response.show {
   display: block;
-  animation: slideUp 0.5s ease-out;
 }
 
-@keyframes slideUp {
-  from {
-    transform: translate(-50%, 100%);
-    opacity: 0;
-  }
-  to {
-    transform: translate(-50%, 0);
-    opacity: 1;
-  }
+.ai-result {
+  text-align: center;
+}
+
+.ai-result.correct .result-message {
+  color: #2ecc71;
+}
+
+.ai-result.incorrect .result-message {
+  color: #e74c3c;
+}
+
+.loading {
+  text-align: center;
+  font-size: 1.2em;
+  color: #666;
+  animation: pulse 1.5s infinite;
+}
+
+.error {
+  text-align: center;
+  color: #e74c3c;
+  font-size: 1.2em;
+}
+
+@keyframes pulse {
+  0% { opacity: 0.6; }
+  50% { opacity: 1; }
+  100% { opacity: 0.6; }
 }

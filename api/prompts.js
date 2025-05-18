@@ -1,9 +1,7 @@
-import { OpenAI } from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize OpenAI
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
+// Initialize Gemini
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 export default async function handler(req, res) {
     // Enable CORS
@@ -15,22 +13,24 @@ export default async function handler(req, res) {
     }
 
     try {
-        const completion = await openai.chat.completions.create({
-            model: "gpt-4",
-            messages: [
-                {
-                    role: "system",
-                    content: "You are a creative prompt generator for a drawing game. Generate 3 random words or short phrases that would be fun to draw. They should be of similar difficulty level. Return ONLY a JSON array with exactly 3 items, no other text."
-                },
-                {
-                    role: "user",
-                    content: "Generate 3 drawing prompts"
-                }
-            ],
-            temperature: 0.9,
-        });
+        // Get the Gemini Pro model
+        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-        const prompts = JSON.parse(completion.choices[0].message.content);
+        const prompt = "Generate 5 fun, creative, and simple drawing prompts for a drawing game. Each prompt should be something that can be drawn in 30 seconds. Return them as a JSON array of strings. Examples: 'a happy cat', 'a sunny beach', 'a flying bird'.";
+
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const text = response.text();
+
+        // Parse the response text to get the array of prompts
+        // The response might include markdown or extra text, so we'll extract just the JSON array
+        const promptsMatch = text.match(/\[.*\]/s);
+        if (!promptsMatch) {
+            throw new Error('Invalid response format');
+        }
+
+        const prompts = JSON.parse(promptsMatch[0]);
+        
         return res.status(200).json(prompts);
     } catch (error) {
         console.error('Error generating prompts:', error);

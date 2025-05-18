@@ -3,33 +3,32 @@ const API_URL = window.location.hostname === 'localhost'
     ? 'http://localhost:3000' 
     : window.location.origin;
 
-// Drawing prompts
-const prompts = [
-    ['Apple', 'Banana', 'Orange'],
-    ['Cat', 'Dog', 'Bird'],
-    ['Car', 'Bicycle', 'Boat'],
-    ['House', 'Tree', 'Flower'],
-    ['Sun', 'Moon', 'Star'],
-    ['Chair', 'Table', 'Lamp'],
-    ['Pizza', 'Burger', 'Hotdog'],
-    ['Book', 'Pencil', 'Paper']
-];
-
 let currentPromptSet = [];
 let selectedPrompt = '';
 let timeLeft = 30;
 let timerInterval = null;
 let isDrawing = false;
+let countdownActive = false;
 
 // Initialize the game
 async function initGame() {
     try {
+        // Reset canvas
+        const canvas = document.getElementById('drawingCanvas');
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
         // Get AI-generated prompts
         const response = await fetch(`${API_URL}/api/prompts`);
-        const prompts = await response.json();
+        if (!response.ok) {
+            throw new Error('Failed to fetch prompts');
+        }
+        const promptsData = await response.json();
+        currentPromptSet = Array.isArray(promptsData) ? promptsData : [];
         
-        // Get random prompt set
-        currentPromptSet = prompts[Math.floor(Math.random() * prompts.length)];
+        if (currentPromptSet.length === 0) {
+            throw new Error('No prompts received');
+        }
         
         // Create prompt buttons
         const promptOptionsDiv = document.getElementById('promptOptions');
@@ -43,13 +42,22 @@ async function initGame() {
             promptOptionsDiv.appendChild(button);
         });
 
-        // Hide timer initially
+        // Hide timer and current prompt
         document.getElementById('timer').style.display = 'none';
         document.getElementById('currentPrompt').style.display = 'none';
+        
+        // Hide AI response
+        const aiResponse = document.getElementById('aiResponse');
+        aiResponse.innerHTML = '';
+        aiResponse.classList.remove('show');
+        
+        // Reset drawing state
+        isDrawing = false;
+        countdownActive = false;
     } catch (error) {
-        console.error('Error fetching prompts:', error);
+        console.error('Error initializing game:', error);
         const promptOptionsDiv = document.getElementById('promptOptions');
-        promptOptionsDiv.innerHTML = '<p>Error loading prompts. Please refresh the page.</p>';
+        promptOptionsDiv.innerHTML = '<p>Error loading prompts. Please try again. Details: ' + error.message + '</p>';
     }
 }
 
@@ -66,9 +74,47 @@ function selectPrompt(prompt) {
     document.getElementById('currentPrompt').style.display = 'block';
     document.getElementById('timer').style.display = 'block';
     
-    // Start timer and enable drawing
-    startTimer();
+    // Start countdown
+    startCountdown();
+}
+
+// Countdown before drawing starts
+function startCountdown() {
+    countdownActive = true;
+    const countdownDiv = document.createElement('div');
+    countdownDiv.className = 'countdown';
+    document.body.appendChild(countdownDiv);
+
+    const messages = ['Ready?', '2', '1', 'START!'];
+    let index = 0;
+
+    function showMessage() {
+        if (index < messages.length) {
+            countdownDiv.textContent = messages[index];
+            countdownDiv.style.color = messages[index] === 'START!' ? '#2ecc71' : '#ffffff';
+            index++;
+            
+            const delay = messages[index - 1] === 'START!' ? 500 : 1000;
+            setTimeout(() => {
+                if (countdownActive) {
+                    showMessage();
+                }
+            }, delay);
+        } else {
+            countdownDiv.remove();
+            startDrawing();
+        }
+    }
+
+    showMessage();
+}
+
+// Start drawing phase
+function startDrawing() {
+    if (!countdownActive) return;
+    
     isDrawing = true;
+    startTimer();
 }
 
 // Timer function
@@ -94,6 +140,7 @@ function updateTimerDisplay() {
 async function endGame() {
     clearInterval(timerInterval);
     isDrawing = false;
+    countdownActive = false;
 
     // Get the canvas data
     const canvas = document.getElementById('drawingCanvas');
@@ -101,7 +148,7 @@ async function endGame() {
 
     // Show loading state
     const aiResponse = document.getElementById('aiResponse');
-    aiResponse.innerHTML = 'AI is analyzing your drawing...';
+    aiResponse.innerHTML = '<div class="loading">AI is analyzing your drawing...</div>';
     aiResponse.classList.add('show');
 
     try {
@@ -110,7 +157,7 @@ async function endGame() {
         displayAIResponse(response);
     } catch (error) {
         console.error('Error analyzing drawing:', error);
-        aiResponse.innerHTML = 'Sorry, there was an error analyzing your drawing.';
+        aiResponse.innerHTML = '<div class="error">Sorry, there was an error analyzing your drawing.</div>';
     }
 }
 
@@ -140,22 +187,24 @@ function displayAIResponse(response) {
     const isCorrect = response.guess.toLowerCase() === selectedPrompt.toLowerCase();
     
     aiResponse.innerHTML = `
-        <h3>AI's Guess: ${response.guess}</h3>
-        <p>Confidence: ${(response.confidence * 100).toFixed(1)}%</p>
-        <p>${response.explanation}</p>
-        <p style="color: ${isCorrect ? '#2ecc71' : '#e74c3c'}">
-            ${isCorrect ? 'Correct! Well done!' : 'Not quite what I expected, but nice try!'}
-        </p>
-        <button onclick="initGame()" class="prompt-option">Play Again</button>
+        <div class="ai-result ${isCorrect ? 'correct' : 'incorrect'}">
+            <h3>AI's Guess: ${response.guess}</h3>
+            <p>Confidence: ${(response.confidence * 100).toFixed(1)}%</p>
+            <p>${response.explanation}</p>
+            <p class="result-message">
+                ${isCorrect ? 'Correct! Well done!' : 'Not quite what I expected, but nice try!'}
+            </p>
+            <button onclick="initGame()" class="prompt-option">Play Again</button>
+        </div>
     `;
 }
 
 // Initialize the game when the page loads
 window.onload = initGame;
 
-// Prevent drawing before prompt selection
+// Prevent drawing before prompt selection and during countdown
 const originalOnResults = window.onResults;
 window.onResults = function(results) {
-    if (!isDrawing) return;
+    if (!isDrawing || countdownActive) return;
     originalOnResults(results);
 }; 

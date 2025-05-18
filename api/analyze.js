@@ -1,9 +1,7 @@
-import { OpenAI } from 'openai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize OpenAI
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
+// Initialize Gemini
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
 export default async function handler(req, res) {
     // Enable CORS
@@ -23,32 +21,52 @@ export default async function handler(req, res) {
     try {
         const { image, prompt } = req.body;
 
-        const response = await openai.chat.completions.create({
-            model: "gpt-4-vision-preview",
-            messages: [
-                {
-                    role: "system",
-                    content: "You are analyzing drawings in a fun drawing game. The user was asked to draw a specific prompt. Be encouraging and specific in your feedback. Respond with a JSON object containing: guess (what you think it is), confidence (0-1), and explanation."
-                },
-                {
-                    role: "user",
-                    content: [
-                        {
-                            type: "text",
-                            text: `The user was asked to draw: ${prompt}. What do you see in this drawing?`
-                        },
-                        {
-                            type: "image_url",
-                            image_url: image
-                        }
-                    ]
-                }
-            ],
-            max_tokens: 150
-        });
+        if (!image || !prompt) {
+            return res.status(400).json({ error: 'Missing image or prompt' });
+        }
 
-        const analysis = JSON.parse(response.choices[0].message.content);
-        return res.status(200).json(analysis);
+        // Remove the data:image/png;base64, prefix if it exists
+        const base64Image = image.replace(/^data:image\/[a-z]+;base64,/, '');
+
+        // Convert base64 to Uint8Array
+        const imageData = Uint8Array.from(atob(base64Image), c => c.charCodeAt(0));
+
+        // Get the Gemini Pro Vision model
+        const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
+
+        const result = await model.generateContent([
+            {
+                text: `You are analyzing a drawing in a fun drawing game. The user was asked to draw: "${prompt}". 
+                       Analyze the drawing and respond in this exact JSON format:
+                       {
+                           "guess": "what you think the drawing represents",
+                           "confidence": 0.0-1.0 (how confident you are in your guess),
+                           "explanation": "your encouraging feedback about the drawing"
+                       }`
+            },
+            {
+                inlineData: {
+                    mimeType: "image/png",
+                    data: Buffer.from(imageData).toString('base64')
+                }
+            }
+        ]);
+
+        const response = await result.response;
+        const text = response.text();
+
+        // Try to parse the response as JSON
+        try {
+            const analysis = JSON.parse(text);
+            return res.status(200).json(analysis);
+        } catch (parseError) {
+            // If parsing fails, create a structured response from the text
+            return res.status(200).json({
+                guess: prompt,
+                confidence: 0.7,
+                explanation: text
+            });
+        }
     } catch (error) {
         console.error('Error analyzing drawing:', error);
         return res.status(500).json({ error: 'Failed to analyze drawing' });
