@@ -1,7 +1,12 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND');
+
+// This is the format Vercel expects
+export const config = {
+    runtime: 'edge'
+};
 
 export default async function handler(req) {
     // Enable CORS
@@ -86,7 +91,11 @@ export default async function handler(req) {
     } catch (error) {
         console.error('Error analyzing drawing:', error);
         return new Response(
-            JSON.stringify({ error: 'Failed to analyze drawing' }),
+            JSON.stringify({ 
+                error: 'Failed to analyze drawing',
+                details: error.message,
+                apiKeyPresent: !!process.env.GOOGLE_API_KEY
+            }),
             { headers, status: 500 }
         );
     }

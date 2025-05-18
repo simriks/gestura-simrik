@@ -41,20 +41,8 @@ export default async function handler(req) {
         // Get the Gemini Pro model
         const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-        // For testing, return a simple response first
-        return new Response(
-            JSON.stringify([
-                "a happy cat",
-                "a sunny beach",
-                "a flying bird",
-                "a tall tree",
-                "a smiling sun"
-            ]),
-            { headers, status: 200 }
-        );
-
-        /* Commenting out the actual API call for now to test routing
-        const prompt = "Generate 5 fun, creative, and simple drawing prompts...";
+        const prompt = "Generate 5 fun, creative, and simple drawing prompts for a drawing game. Each prompt should be something that can be drawn in 30 seconds. Return them as a JSON array of strings. Examples: 'a happy cat', 'a sunny beach', 'a flying bird'.";
+        
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
@@ -70,7 +58,6 @@ export default async function handler(req) {
             JSON.stringify(prompts),
             { headers, status: 200 }
         );
-        */
     } catch (error) {
         console.error('Error in prompts API:', error.message);
         return new Response(
