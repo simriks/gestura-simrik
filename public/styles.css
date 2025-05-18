@@ -42,7 +42,7 @@ body {
   left: 50%;
   transform: translateX(-50%);
   width: 90%;
-  max-width: 600px;
+  max-width: 700px;
   height: 115%;
   object-fit: cover;
   z-index: 0;

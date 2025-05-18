@@ -16,7 +16,6 @@
 
     <!-- Style Selection -->
     <div class="style-selector">
-      <h2>Choose Art Style</h2>
       <div class="style-options">
         <button class="style-btn active" data-style="van-gogh">Van Gogh</button>
         <button class="style-btn" data-style="anime">Anime</button>
@@ -26,12 +25,13 @@
       </div>
     </div>
 
-    <!-- Drawing Area -->
+    <!-- Main Content Area -->
     <div class="split-view">
-      <!-- Original Drawing -->
+      <!-- Drawing Canvas -->
       <div class="canvas-section">
         <h3>Your Drawing</h3>
         <canvas id="drawingCanvas" width="800" height="600"></canvas>
+        <video id="webcam" autoplay playsinline></video>
       </div>
 
       <!-- AI Generated Art -->
@@ -41,11 +41,6 @@
           <div class="placeholder">Draw something to see the AI transformation!</div>
         </div>
       </div>
-    </div>
-
-    <!-- Webcam Section -->
-    <div class="webcam-section">
-      <video id="webcam" autoplay playsinline></video>
     </div>
 
     <!-- Controls -->
