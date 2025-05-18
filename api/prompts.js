@@ -1,7 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND');
 
 export default async function handler(req) {
     // Enable CORS
@@ -11,6 +11,10 @@ export default async function handler(req) {
         'Access-Control-Allow-Headers': 'Content-Type',
         'Content-Type': 'application/json'
     };
+
+    // Log request information
+    console.log('API Key present:', !!process.env.GOOGLE_API_KEY);
+    console.log('Request method:', req.method);
 
     // Handle preflight request
     if (req.method === 'OPTIONS') {
@@ -25,6 +29,10 @@ export default async function handler(req) {
     }
 
     try {
+        if (!process.env.GOOGLE_API_KEY) {
+            throw new Error('Google API Key not found in environment variables');
+        }
+
         // Get the Gemini Pro model
         const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
@@ -37,7 +45,7 @@ export default async function handler(req) {
         // Parse the response text to get the array of prompts
         const promptsMatch = text.match(/\[.*\]/s);
         if (!promptsMatch) {
-            throw new Error('Invalid response format');
+            throw new Error('Invalid response format from Gemini API');
         }
 
         const prompts = JSON.parse(promptsMatch[0]);
@@ -47,9 +55,13 @@ export default async function handler(req) {
             { headers, status: 200 }
         );
     } catch (error) {
-        console.error('Error generating prompts:', error);
+        console.error('Error in prompts API:', error.message);
         return new Response(
-            JSON.stringify({ error: 'Failed to generate prompts' }),
+            JSON.stringify({ 
+                error: 'Failed to generate prompts',
+                details: error.message,
+                apiKeyPresent: !!process.env.GOOGLE_API_KEY
+            }),
             { headers, status: 500 }
         );
     }
