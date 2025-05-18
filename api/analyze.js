@@ -24,6 +24,19 @@ export default async function handler(req) {
         return new Response(null, { headers, status: 200 });
     }
     
+    if (req.method === 'GET') {
+        return new Response(
+            JSON.stringify({ error: 'Use POST method instead' }),
+            { 
+                headers: {
+                    'Access-Control-Allow-Origin': '*',
+                    'Content-Type': 'application/json'
+                },
+                status: 405 
+            }
+        );
+    }
+
     if (req.method !== 'POST') {
         return new Response(
             JSON.stringify({ error: 'Method not allowed' }),
