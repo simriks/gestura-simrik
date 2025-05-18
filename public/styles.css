@@ -350,9 +350,8 @@ header p {
 /* Current Prompt Display */
 .current-prompt {
   position: fixed;
-  top: 20px;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 100px;
+  right: 20px;
   font-size: 1.5rem;
   font-weight: bold;
   color: #2c3e50;
@@ -363,6 +362,7 @@ header p {
   backdrop-filter: blur(5px);
   z-index: 1000;
   margin: 0;
+  text-align: center;
 }
 
 /* AI Response Styles */
