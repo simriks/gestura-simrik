@@ -42,6 +42,10 @@ export default async function handler(req) {
             );
         }
 
+        // First, list available models
+        const models = await genAI.listModels();
+        console.log('Available models:', models);
+
         // Remove the data:image/png;base64, prefix if it exists
         const base64Image = image.replace(/^data:image\/[a-z]+;base64,/, '');
 
@@ -72,6 +76,7 @@ export default async function handler(req) {
         try {
             // Format the response as JSON
             const analysis = {
+                models: models,
                 guess: prompt,
                 confidence: 0.8,
                 explanation: text
@@ -84,6 +89,7 @@ export default async function handler(req) {
         } catch (parseError) {
             return new Response(
                 JSON.stringify({
+                    models: models,
                     guess: prompt,
                     confidence: 0.7,
                     explanation: text

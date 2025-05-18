@@ -29,12 +29,16 @@ export default async function handler(req) {
             throw new Error('GOOGLE_API_KEY has default value, not properly set');
         }
 
-        // Get the Gemini Pro model
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-pro"
-        });
-
         try {
+            // First, list available models
+            const models = await genAI.listModels();
+            console.log('Available models:', models);
+
+            // Get the Gemini Pro model
+            const model = genAI.getGenerativeModel({ 
+                model: "gemini-pro"
+            });
+
             // Simple test call to Gemini with minimal prompt
             const result = await model.generateContent("Return a JSON array of 5 drawing prompts");
             const response = await result.response;
@@ -44,7 +48,10 @@ export default async function handler(req) {
             try {
                 const prompts = JSON.parse(text);
                 return new Response(
-                    JSON.stringify(prompts),
+                    JSON.stringify({
+                        models: models,
+                        prompts: prompts
+                    }),
                     { headers, status: 200 }
                 );
             } catch (parseError) {
@@ -55,7 +62,10 @@ export default async function handler(req) {
                 }
                 const prompts = JSON.parse(promptsMatch[0]);
                 return new Response(
-                    JSON.stringify(prompts),
+                    JSON.stringify({
+                        models: models,
+                        prompts: prompts
+                    }),
                     { headers, status: 200 }
                 );
             }
@@ -74,10 +84,7 @@ export default async function handler(req) {
                 apiKeyValue: process.env.GOOGLE_API_KEY ? 'Key exists but hidden' : 'No key found',
                 endpoint: 'Using v1 endpoint'
             }),
-            { 
-                headers, 
-                status: 500 
-            }
+            { headers, status: 500 }
         );
     }
 } 
