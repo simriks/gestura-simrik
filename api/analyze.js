@@ -112,15 +112,31 @@ export default async function handler(req) {
             );
         } catch (parseError) {
             console.error('Failed to parse AI response:', parseError);
-            // If parsing fails, try to extract meaningful content
-            const matches = text.match(/["']guess["']\s*:\s*["']([^"']+)["']/);
-            const guess = matches ? matches[1] : 'unknown';
             
+            // Try to extract JSON from the response using regex
+            const jsonMatch = text.match(/\{[\s\S]*\}/);
+            if (jsonMatch) {
+                try {
+                    const extractedJson = JSON.parse(jsonMatch[0]);
+                    return new Response(
+                        JSON.stringify({
+                            guess: extractedJson.guess || 'unknown',
+                            confidence: Number(extractedJson.confidence) || 0.5,
+                            explanation: extractedJson.explanation || 'Unable to provide detailed explanation'
+                        }),
+                        { headers, status: 200 }
+                    );
+                } catch (secondaryParseError) {
+                    console.error('Failed secondary JSON parsing:', secondaryParseError);
+                }
+            }
+            
+            // If all parsing attempts fail, return a clean fallback response
             return new Response(
                 JSON.stringify({
-                    guess: guess,
+                    guess: 'unknown',
                     confidence: 0.5,
-                    explanation: "I can see a drawing, but I'm not entirely sure what it represents. Here's my best guess based on the visual elements I can identify: " + text
+                    explanation: 'I can see the drawing but am unable to provide a detailed analysis at this time.'
                 }),
                 { headers, status: 200 }
             );
