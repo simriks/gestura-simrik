@@ -34,11 +34,11 @@ async function initGame() {
         const promptOptionsDiv = document.getElementById('promptOptions');
         promptOptionsDiv.innerHTML = '';
         
-        currentPromptSet.forEach(prompt => {
+        currentPromptSet.forEach(promptObj => {
             const button = document.createElement('button');
             button.className = 'prompt-option';
-            button.textContent = prompt;
-            button.onclick = () => selectPrompt(prompt);
+            button.textContent = promptObj.prompt;
+            button.onclick = () => selectPrompt(promptObj.prompt);
             promptOptionsDiv.appendChild(button);
         });
 
