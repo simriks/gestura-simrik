@@ -1,9 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize Gemini with API version
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND', {
-    apiVersion: 'v1'
-});
+// Initialize Gemini
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND');
 
 // This is the format Vercel expects
 export const config = {
@@ -57,31 +55,29 @@ export default async function handler(req) {
             }
         });
 
-        const result = await model.generateContent({
-            contents: [
-                {
-                    role: 'user',
-                    parts: [
-                        {
-                            text: `You are analyzing a drawing in a fun drawing game. The user was asked to draw: "${prompt}". 
-                                   Analyze the drawing and respond in this exact JSON format:
-                                   {
-                                       "guess": "what you think the drawing represents",
-                                       "confidence": 0.0-1.0 (how confident you are in your guess),
-                                       "explanation": "your encouraging feedback about the drawing"
-                                   }`
-                        },
-                        {
-                            inlineData: {
-                                mimeType: "image/png",
-                                data: Buffer.from(imageData).toString('base64')
-                            }
+        const request = {
+            contents: [{
+                parts: [
+                    {
+                        text: `You are analyzing a drawing in a fun drawing game. The user was asked to draw: "${prompt}". 
+                               Analyze the drawing and respond in this exact JSON format:
+                               {
+                                   "guess": "what you think the drawing represents",
+                                   "confidence": 0.0-1.0 (how confident you are in your guess),
+                                   "explanation": "your encouraging feedback about the drawing"
+                               }`
+                    },
+                    {
+                        inlineData: {
+                            mimeType: "image/png",
+                            data: Buffer.from(imageData).toString('base64')
                         }
-                    ]
-                }
-            ]
-        });
+                    }
+                ]
+            }]
+        };
 
+        const result = await model.generateContent(request);
         const response = await result.response;
         const text = response.text();
 

@@ -1,9 +1,7 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Gemini with API version
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND', {
-    apiVersion: 'v1'
-});
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND');
 
 // This is the format Vercel expects
 export const config = {
@@ -40,9 +38,15 @@ export default async function handler(req) {
 
         try {
             // Simple test call to Gemini
-            const result = await model.generateContent({
-                contents: [{ text: "Generate 5 simple drawing prompts. Return them as a JSON array of strings." }]
-            });
+            const prompt = {
+                contents: [{
+                    parts: [{
+                        text: "Generate 5 simple drawing prompts. Return them as a JSON array of strings."
+                    }]
+                }]
+            };
+
+            const result = await model.generateContent(prompt);
             const response = await result.response;
             const text = response.text();
             
