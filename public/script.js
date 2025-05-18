@@ -400,20 +400,7 @@ function changeBrushSize(size) {
 
 // Create control panel
 const controlPanel = document.createElement('div');
-controlPanel.style.position = 'fixed';
-controlPanel.style.left = '20px';
-controlPanel.style.top = '50%';
-controlPanel.style.transform = 'translateY(-50%)';
-controlPanel.style.backgroundColor = 'white';
-controlPanel.style.padding = '20px';
-controlPanel.style.borderRadius = '15px';
-controlPanel.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
-controlPanel.style.display = 'flex';
-controlPanel.style.flexDirection = 'column';
-controlPanel.style.gap = '15px';
-controlPanel.style.zIndex = '1000';
-controlPanel.style.alignItems = 'center'; // Center all flex items
-controlPanel.style.width = '140px'; // Set fixed width for consistent centering
+controlPanel.className = 'control-panel';
 document.body.appendChild(controlPanel);
 
 // Add title for colors
@@ -422,17 +409,17 @@ colorsTitle.textContent = 'Colors';
 colorsTitle.style.fontFamily = 'Arial, sans-serif';
 colorsTitle.style.fontWeight = 'bold';
 colorsTitle.style.marginBottom = '10px';
-colorsTitle.style.textAlign = 'center'; // Center text
+colorsTitle.style.textAlign = 'center';
 controlPanel.appendChild(colorsTitle);
 
 // Create color swatches container
 const colorSwatches = document.createElement('div');
 colorSwatches.style.display = 'grid';
 colorSwatches.style.gridTemplateColumns = 'repeat(2, 1fr)';
-colorSwatches.style.gap = '15px'; // Increased gap for better spacing
-colorSwatches.style.justifyItems = 'center'; // Center grid items horizontally
-colorSwatches.style.alignItems = 'center'; // Center grid items vertically
-colorSwatches.style.padding = '0 10px'; // Add padding for better centering
+colorSwatches.style.gap = '15px';
+colorSwatches.style.justifyItems = 'center';
+colorSwatches.style.alignItems = 'center';
+colorSwatches.style.padding = '0 10px';
 controlPanel.appendChild(colorSwatches);
 
 // Add color swatches

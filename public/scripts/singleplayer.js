@@ -134,9 +134,29 @@ function startTimer() {
         updateTimerDisplay();
         
         if (timeLeft <= 0) {
-            endGame();
+            clearInterval(timerInterval);
+            showTimeUpMessage();
+            setTimeout(() => {
+                endGame();
+            }, 1500);
         }
     }, 1000);
+}
+
+function showTimeUpMessage() {
+    const timeUpDiv = document.createElement('div');
+    timeUpDiv.className = 'times-up';
+    timeUpDiv.textContent = 'Time\'s Up!';
+    document.body.appendChild(timeUpDiv);
+
+    setTimeout(() => {
+        timeUpDiv.style.opacity = '0';
+        timeUpDiv.style.transform = 'translate(-50%, -50%) scale(0.8)';
+        timeUpDiv.style.transition = 'all 0.3s ease-out';
+        setTimeout(() => {
+            timeUpDiv.remove();
+        }, 300);
+    }, 1500);
 }
 
 function updateTimerDisplay() {
@@ -145,7 +165,6 @@ function updateTimerDisplay() {
 
 // End game and get AI guess
 async function endGame() {
-    clearInterval(timerInterval);
     isDrawing = false;
     countdownActive = false;
 
@@ -153,9 +172,14 @@ async function endGame() {
     const canvas = document.getElementById('drawingCanvas');
     const imageData = canvas.toDataURL('image/png');
 
-    // Show loading state
+    // Show loading state with larger, centered display
     const aiResponse = document.getElementById('aiResponse');
-    aiResponse.innerHTML = '<div class="loading">AI is analyzing your drawing...</div>';
+    aiResponse.innerHTML = `
+        <div class="loading">
+            <div>AI is analyzing your drawing...</div>
+            <div style="font-size: 1.2rem; margin-top: 10px; opacity: 0.7">This may take a few seconds</div>
+        </div>
+    `;
     aiResponse.classList.add('show');
 
     try {
@@ -164,7 +188,13 @@ async function endGame() {
         displayAIResponse(response);
     } catch (error) {
         console.error('Error analyzing drawing:', error);
-        aiResponse.innerHTML = '<div class="error">Sorry, there was an error analyzing your drawing.</div>';
+        aiResponse.innerHTML = `
+            <div class="ai-result incorrect">
+                <h3>Error</h3>
+                <p>Sorry, there was an error analyzing your drawing.</p>
+                <button onclick="initGame()">Try Again</button>
+            </div>
+        `;
     }
 }
 
@@ -199,9 +229,9 @@ function displayAIResponse(response) {
             <p>Confidence: ${(response.confidence * 100).toFixed(1)}%</p>
             <p>${response.explanation}</p>
             <p class="result-message">
-                ${isCorrect ? 'Correct! Well done!' : 'Not quite what I expected, but nice try!'}
+                ${isCorrect ? 'Correct! Well done! 🎉' : 'Not quite what I expected, but nice try! 🎨'}
             </p>
-            <button onclick="initGame()" class="prompt-option">Play Again</button>
+            <button onclick="initGame()">Play Again</button>
         </div>
     `;
 }
