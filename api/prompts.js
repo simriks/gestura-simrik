@@ -17,56 +17,62 @@ export default async function handler(req) {
         'Content-Type': 'application/json'
     };
 
-    // Log request information
-    console.log('API Key present:', !!process.env.GOOGLE_API_KEY);
-    console.log('Request method:', req.method);
-
-    // Handle preflight request
-    if (req.method === 'OPTIONS') {
-        return new Response(null, { headers, status: 200 });
-    }
-    
-    if (req.method !== 'GET') {
-        return new Response(
-            JSON.stringify({ error: 'Method not allowed' }), 
-            { headers, status: 405 }
-        );
-    }
-
     try {
+        // First, check if we have the API key
         if (!process.env.GOOGLE_API_KEY) {
-            throw new Error('Google API Key not found in environment variables');
+            throw new Error('GOOGLE_API_KEY is not set in environment variables');
+        }
+
+        if (process.env.GOOGLE_API_KEY === 'NO_KEY_FOUND') {
+            throw new Error('GOOGLE_API_KEY has default value, not properly set');
         }
 
         // Get the Gemini Pro model
         const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-        const prompt = "Generate 5 fun, creative, and simple drawing prompts for a drawing game. Each prompt should be something that can be drawn in 30 seconds. Return them as a JSON array of strings. Examples: 'a happy cat', 'a sunny beach', 'a flying bird'.";
-        
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const text = response.text();
-
-        const promptsMatch = text.match(/\[.*\]/s);
-        if (!promptsMatch) {
-            throw new Error('Invalid response format from Gemini API');
+        try {
+            // Simple test call to Gemini
+            const result = await model.generateContent("Return exactly this array: ['test prompt 1', 'test prompt 2']");
+            const response = await result.response;
+            const text = response.text();
+            
+            // Try to parse as JSON first
+            try {
+                const prompts = JSON.parse(text);
+                return new Response(
+                    JSON.stringify(prompts),
+                    { headers, status: 200 }
+                );
+            } catch (parseError) {
+                // If parsing fails, try to extract array using regex
+                const promptsMatch = text.match(/\[.*\]/s);
+                if (!promptsMatch) {
+                    throw new Error('Could not parse Gemini response: ' + text);
+                }
+                const prompts = JSON.parse(promptsMatch[0]);
+                return new Response(
+                    JSON.stringify(prompts),
+                    { headers, status: 200 }
+                );
+            }
+        } catch (geminiError) {
+            throw new Error('Gemini API error: ' + geminiError.message);
         }
-
-        const prompts = JSON.parse(promptsMatch[0]);
-        
-        return new Response(
-            JSON.stringify(prompts),
-            { headers, status: 200 }
-        );
     } catch (error) {
-        console.error('Error in prompts API:', error.message);
+        console.error('Error in prompts API:', error);
+        
+        // Return detailed error information
         return new Response(
             JSON.stringify({ 
                 error: 'Failed to generate prompts',
                 details: error.message,
-                apiKeyPresent: !!process.env.GOOGLE_API_KEY
+                apiKeyPresent: !!process.env.GOOGLE_API_KEY,
+                apiKeyValue: process.env.GOOGLE_API_KEY ? 'Key exists but hidden' : 'No key found'
             }),
-            { headers, status: 500 }
+            { 
+                headers, 
+                status: 500 
+            }
         );
     }
 } 
