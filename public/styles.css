@@ -207,8 +207,8 @@ header p {
 .canvas-section {
   margin-top: 150px;
   position: relative;
-  width: 90%;
-  max-width: 1000px;
+  width: 80%;
+  max-width: 800px;
   height: 600px;
   margin-bottom: 20px;
   display: flex;
@@ -229,7 +229,7 @@ header p {
 .webcam-section {
   position: absolute;
   top: 50%;
-  right: 30px;
+  right: -190px;
   transform: translateY(-50%) scaleX(-1);
   width: 200px;
   border-radius: 10px;
