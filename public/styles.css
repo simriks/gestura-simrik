@@ -203,7 +203,8 @@ header p {
 }
 
 /* Freestyle Page Specific Styles */
-.freestyle-page .canvas-section {
+/* Canvas Section */
+.canvas-section {
   margin-top: 150px;
   position: relative;
   width: 90%;
@@ -215,7 +216,17 @@ header p {
   align-items: center;
 }
 
-.freestyle-page .webcam-section {
+#drawingCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Webcam Section */
+.webcam-section {
   position: absolute;
   top: 50%;
   right: -190px;
@@ -223,6 +234,21 @@ header p {
   width: 200px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+#webcam {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* Controls Section */
+.controls {
+  display: none;
+}
+
+.controls button {
+  display: none;
 }
 
 /* Art Mode Specific Styles */
