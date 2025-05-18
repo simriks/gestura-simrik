@@ -42,9 +42,9 @@ export default async function handler(req) {
             );
         }
 
-        // Get the Gemini Pro Vision model
+        // Get the Gemini 1.5 Pro model
         const model = genAI.getGenerativeModel({ 
-            model: "gemini-pro-vision"
+            model: "gemini-1.5-pro"
         });
 
         // First do a simple test to check if the model is accessible
