@@ -35,9 +35,9 @@ export default async function handler(req) {
         const body = await req.json();
         const { image, prompt } = body;
 
-        if (!image || !prompt) {
+        if (!image) {
             return new Response(
-                JSON.stringify({ error: 'Missing image or prompt' }),
+                JSON.stringify({ error: 'Missing image' }),
                 { headers, status: 400 }
             );
         }
@@ -65,7 +65,23 @@ export default async function handler(req) {
 
         // Create parts array for the model
         const parts = [
-            { text: `Analyze this drawing. The user was asked to draw: "${prompt}". What do you see?` },
+            {
+                text: `Look at this drawing and tell me what you think it represents. 
+                Rules:
+                - Respond with a JSON object containing:
+                  - guess: a single word (noun) that best describes what you see
+                  - confidence: a number between 0 and 1 indicating your confidence
+                  - explanation: a brief analysis of what you see and why you made this guess
+                - The guess should be a simple, common noun
+                - Focus on the most obvious interpretation
+                - Be concise but descriptive
+                Example format: 
+                {
+                    "guess": "tree",
+                    "confidence": 0.85,
+                    "explanation": "The drawing shows a vertical trunk with branches spreading at the top and leaf-like shapes, characteristic of a simple tree drawing."
+                }`
+            },
             {
                 inlineData: {
                     mimeType: "image/png",
@@ -80,23 +96,31 @@ export default async function handler(req) {
 
         // Try to parse the response as JSON
         try {
-            // Format the response as JSON
-            const analysis = {
-                guess: prompt,
-                confidence: 0.8,
-                explanation: text
-            };
+            const analysis = JSON.parse(text);
+            
+            // Verify the response format
+            if (!analysis.guess || !analysis.confidence || !analysis.explanation) {
+                throw new Error('Invalid response format');
+            }
+
+            // Ensure confidence is a number between 0 and 1
+            analysis.confidence = Math.min(1, Math.max(0, Number(analysis.confidence)));
             
             return new Response(
                 JSON.stringify(analysis),
                 { headers, status: 200 }
             );
         } catch (parseError) {
+            console.error('Failed to parse AI response:', parseError);
+            // If parsing fails, try to extract meaningful content
+            const matches = text.match(/["']guess["']\s*:\s*["']([^"']+)["']/);
+            const guess = matches ? matches[1] : 'unknown';
+            
             return new Response(
                 JSON.stringify({
-                    guess: prompt,
-                    confidence: 0.7,
-                    explanation: text
+                    guess: guess,
+                    confidence: 0.5,
+                    explanation: "I can see a drawing, but I'm not entirely sure what it represents. Here's my best guess based on the visual elements I can identify: " + text
                 }),
                 { headers, status: 200 }
             );
