@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gestura - AI Art Transformation</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Absolute positioning with original dimensions */
+    .artmode-page .split-view {
+      position: relative;
+      min-height: 600px;
+    }
+    
+    .artmode-page .canvas-section {
+      position: absolute;
+      top: 0;
+      left: 1000px; /* Adjusted from 20px to move it closer to result-section */
+      right: auto;
+      width: 600px;
+      height: 600px;
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    .artmode-page .result-section {
+      position: absolute;
+      right: -700px;
+      left: auto;
+      top: 0;
+      width: 600px;  /* Matching original width */
+      height: 600px; /* Matching original height */
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+    }
+
+    /* Canvas sizing */
+    .artmode-page #drawingCanvas {
+      width: 600px !important;
+      height: 600px !important;
+    }
+    
+    .artmode-page #aiArtDisplay {
+      width: 100%;
+      height: 100%;
+    }
+    
+    /* Webcam remains unchanged */
+    .artmode-page #webcam {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 160px;
+      height: 120px;
+    }
+  </style>
+</head>
+<body class="game-page artmode-page">
+  <div class="container">
+    <!-- Header -->
+    <header>
+      <h1>AI Art Transformation</h1>
+      <p>Draw anything and let AI transform it into beautiful artwork!</p>
+    </header>
+
+    <!-- Style Selection -->
+    <div class="style-selector">
+      <div class="style-options">
+        <button class="style-btn active" data-style="van-gogh">Van Gogh</button>
+        <button class="style-btn" data-style="anime">Anime</button>
+        <button class="style-btn" data-style="pixel">Pixel Art</button>
+        <button class="style-btn" data-style="watercolor">Watercolor</button>
+        <button class="style-btn" data-style="sketch">Pencil Sketch</button>
+      </div>
+    </div>
+
+    <!-- Main Content Area -->
+    <div class="split-view">
+      <!-- Drawing Canvas -->
+      <div class="canvas-section">
+        <h3>Your Drawing</h3>
+        <canvas id="drawingCanvas" width="800" height="600"></canvas>
+        <video id="webcam" autoplay playsinline></video>
+      </div>
+
+      <!-- AI Generated Art -->
+      <div class="result-section">
+        <h3>AI Transformation</h3>
+        <div id="aiArtDisplay">
+          <div class="placeholder">Draw something to see the AI transformation!</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Controls -->
+    <div class="art-controls">
+      <button id="transformBtn" class="primary-button">Transform Drawing</button>
+      <button id="clearBtn" class="secondary-button">Clear Canvas</button>
+    </div>
+  </div>
+
+  <!-- Include Scripts -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="script.js"></script>
+  <script src="scripts/artmode.js"></script>
+</body>
+</html> 
