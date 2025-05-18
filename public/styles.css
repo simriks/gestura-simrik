@@ -43,7 +43,7 @@ body {
   transform: translateX(-50%);
   width: 90%;
   max-width: 600px;
-  height: auto;
+  height: 115%;
   object-fit: cover;
   z-index: 0;
   opacity: 0.9;
