@@ -42,20 +42,26 @@ export default async function handler(req) {
             );
         }
 
-        // First, list available models
-        const models = await genAI.listModels();
-        console.log('Available models:', models);
+        // Get the Gemini Pro Vision model
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-pro-vision"
+        });
+
+        // First do a simple test to check if the model is accessible
+        try {
+            const testResult = await model.generateContent("Test connection.");
+            await testResult.response;
+            console.log('Model connection test successful');
+        } catch (testError) {
+            console.error('Model connection test failed:', testError);
+            throw new Error(`Model connection test failed: ${testError.message}`);
+        }
 
         // Remove the data:image/png;base64, prefix if it exists
         const base64Image = image.replace(/^data:image\/[a-z]+;base64,/, '');
 
         // Convert base64 to Uint8Array
         const imageData = Uint8Array.from(atob(base64Image), c => c.charCodeAt(0));
-
-        // Get the Gemini Pro Vision model
-        const model = genAI.getGenerativeModel({ 
-            model: "gemini-pro-vision"
-        });
 
         // Create parts array for the model
         const parts = [
@@ -76,7 +82,6 @@ export default async function handler(req) {
         try {
             // Format the response as JSON
             const analysis = {
-                models: models,
                 guess: prompt,
                 confidence: 0.8,
                 explanation: text
@@ -89,7 +94,6 @@ export default async function handler(req) {
         } catch (parseError) {
             return new Response(
                 JSON.stringify({
-                    models: models,
                     guess: prompt,
                     confidence: 0.7,
                     explanation: text

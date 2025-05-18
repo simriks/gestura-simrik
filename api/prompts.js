@@ -30,16 +30,17 @@ export default async function handler(req) {
         }
 
         try {
-            // First, list available models
-            const models = await genAI.listModels();
-            console.log('Available models:', models);
-
             // Get the Gemini Pro model
             const model = genAI.getGenerativeModel({ 
                 model: "gemini-pro"
             });
 
-            // Simple test call to Gemini with minimal prompt
+            // First do a simple test to check if the model is accessible
+            const testResult = await model.generateContent("Test connection.");
+            await testResult.response;
+            console.log('Model connection test successful');
+
+            // Now proceed with the actual prompt
             const result = await model.generateContent("Return a JSON array of 5 drawing prompts");
             const response = await result.response;
             const text = response.text();
@@ -48,10 +49,7 @@ export default async function handler(req) {
             try {
                 const prompts = JSON.parse(text);
                 return new Response(
-                    JSON.stringify({
-                        models: models,
-                        prompts: prompts
-                    }),
+                    JSON.stringify(prompts),
                     { headers, status: 200 }
                 );
             } catch (parseError) {
@@ -62,10 +60,7 @@ export default async function handler(req) {
                 }
                 const prompts = JSON.parse(promptsMatch[0]);
                 return new Response(
-                    JSON.stringify({
-                        models: models,
-                        prompts: prompts
-                    }),
+                    JSON.stringify(prompts),
                     { headers, status: 200 }
                 );
             }
