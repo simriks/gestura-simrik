@@ -7,6 +7,7 @@
     "routes": [
         { "src": "/api/prompts", "dest": "/api/prompts.js" },
         { "src": "/api/analyze", "dest": "/api/analyze.js" },
+        { "src": "/api/transform", "dest": "/api/transform.js" },
         { "src": "^/$", "dest": "/public/home.html" },
         { "src": "/(.*)", "dest": "/public/$1" }
     ]
