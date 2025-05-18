@@ -5,6 +5,28 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Gestura - AI Art Transformation</title>
   <link rel="stylesheet" href="styles.css">
+  <style>
+    /* Temporary debug styles - can remove after layout is fixed */
+    .artmode-page .split-view {
+      border: 2px dashed red;
+      min-height: 600px; /* Ensure minimum height */
+    }
+    .artmode-page .canvas-section,
+    .artmode-page .result-section {
+      border: 2px dashed blue;
+      flex: 1;
+    }
+    .artmode-page #webcam {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 160px;
+      height: 120px;
+      border-radius: 8px;
+      transform: scaleX(-1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    }
+  </style>
 </head>
 <body class="game-page artmode-page">
   <div class="container">
