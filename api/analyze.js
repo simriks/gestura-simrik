@@ -66,21 +66,11 @@ export default async function handler(req) {
         // Create parts array for the model
         const parts = [
             {
-                text: `Look at this drawing and tell me what you think it represents. 
-                Rules:
-                - Respond with a JSON object containing:
-                  - guess: a single word (noun) that best describes what you see
-                  - confidence: a number between 0 and 1 indicating your confidence
-                  - explanation: a brief analysis of what you see and why you made this guess
-                - The guess should be a simple, common noun
-                - Focus on the most obvious interpretation
-                - Be concise but descriptive
-                Example format: 
-                {
-                    "guess": "tree",
-                    "confidence": 0.85,
-                    "explanation": "The drawing shows a vertical trunk with branches spreading at the top and leaf-like shapes, characteristic of a simple tree drawing."
-                }`
+                text: `Respond with ONLY a raw JSON object containing:
+                - guess: (string)
+                - confidence: (number 0-1) 
+                - explanation: (string)
+                NO markdown formatting or additional text.`
             },
             {
                 inlineData: {
@@ -94,49 +84,41 @@ export default async function handler(req) {
         const response = await result.response;
         const text = response.text();
 
-        // Try to parse the response as JSON
+        // Replace the current try-catch block with this:
         try {
-            const analysis = JSON.parse(text);
-            
-            // Verify the response format
-            if (!analysis.guess || !analysis.confidence || !analysis.explanation) {
-                throw new Error('Invalid response format');
-            }
-
-            // Ensure confidence is a number between 0 and 1
-            analysis.confidence = Math.min(1, Math.max(0, Number(analysis.confidence)));
-            
-            return new Response(
-                JSON.stringify(analysis),
-                { headers, status: 200 }
-            );
-        } catch (parseError) {
-            console.error('Failed to parse AI response:', parseError);
-            
-            // Try to extract JSON from the response using regex
-            const jsonMatch = text.match(/\{[\s\S]*\}/);
-            if (jsonMatch) {
-                try {
-                    const extractedJson = JSON.parse(jsonMatch[0]);
-                    return new Response(
-                        JSON.stringify({
-                            guess: extractedJson.guess || 'unknown',
-                            confidence: Number(extractedJson.confidence) || 0.5,
-                            explanation: extractedJson.explanation || 'Unable to provide detailed explanation'
-                        }),
-                        { headers, status: 200 }
-                    );
-                } catch (secondaryParseError) {
-                    console.error('Failed secondary JSON parsing:', secondaryParseError);
+            // First attempt to parse directly
+            try {
+                const analysis = JSON.parse(text);
+                if (analysis.guess) return formatSuccess(analysis);
+            } catch (e) {
+                // If direct parse fails, try cleaning markdown
+                const cleanText = text.replace(/^```json|```$/g, '').trim();
+                const analysis = JSON.parse(cleanText);
+                if (analysis.guess) return formatSuccess(analysis);
+                
+                // If still fails, try extracting JSON from string
+                const jsonMatch = text.match(/\{[\s\S]*\}/);
+                if (jsonMatch) {
+                    const analysis = JSON.parse(jsonMatch[0]);
+                    if (analysis.guess) return formatSuccess(analysis);
                 }
             }
             
-            // If all parsing attempts fail, return a clean fallback response
+            // If all parsing attempts fail
+            throw new Error('Could not extract valid JSON from response');
+            
+            // Helper function for consistent success responses
+            function formatSuccess(analysis) {
+                analysis.confidence = Math.min(1, Math.max(0, Number(analysis.confidence)));
+                return new Response(JSON.stringify(analysis), { headers, status: 200 });
+            }
+        } catch (parseError) {
+            console.error('All parsing attempts failed:', parseError);
             return new Response(
                 JSON.stringify({
                     guess: 'unknown',
                     confidence: 0.5,
-                    explanation: 'I can see the drawing but am unable to provide a detailed analysis at this time.'
+                    explanation: 'The AI response format was unexpected'
                 }),
                 { headers, status: 200 }
             );
