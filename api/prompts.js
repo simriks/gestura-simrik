@@ -3,6 +3,11 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND');
 
+// This is the format Vercel expects
+export const config = {
+    runtime: 'edge'
+};
+
 export default async function handler(req) {
     // Enable CORS
     const headers = {
@@ -36,13 +41,24 @@ export default async function handler(req) {
         // Get the Gemini Pro model
         const model = genAI.getGenerativeModel({ model: "gemini-pro" });
 
-        const prompt = "Generate 5 fun, creative, and simple drawing prompts for a drawing game. Each prompt should be something that can be drawn in 30 seconds. Return them as a JSON array of strings. Examples: 'a happy cat', 'a sunny beach', 'a flying bird'.";
+        // For testing, return a simple response first
+        return new Response(
+            JSON.stringify([
+                "a happy cat",
+                "a sunny beach",
+                "a flying bird",
+                "a tall tree",
+                "a smiling sun"
+            ]),
+            { headers, status: 200 }
+        );
 
+        /* Commenting out the actual API call for now to test routing
+        const prompt = "Generate 5 fun, creative, and simple drawing prompts...";
         const result = await model.generateContent(prompt);
         const response = await result.response;
         const text = response.text();
 
-        // Parse the response text to get the array of prompts
         const promptsMatch = text.match(/\[.*\]/s);
         if (!promptsMatch) {
             throw new Error('Invalid response format from Gemini API');
@@ -54,6 +70,7 @@ export default async function handler(req) {
             JSON.stringify(prompts),
             { headers, status: 200 }
         );
+        */
     } catch (error) {
         console.error('Error in prompts API:', error.message);
         return new Response(
