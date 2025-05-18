@@ -561,7 +561,7 @@ header p {
 /* Singleplayer-specific styles */
 #drawingScreen .canvas-section {
   width: 95%;
-  max-width: 1400px;
+  max-width: 1700px;
 }
 
 #drawingScreen .webcam-section {
