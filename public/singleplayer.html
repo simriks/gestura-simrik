@@ -6,7 +6,7 @@
   <title>Gestura - Single-Player AI Guessing Game</title>
   <link rel="stylesheet" href="styles.css">
 </head>
-<body>
+<body class="game-page">
   <div class="container">
     <!-- Header -->
     <header>
@@ -43,11 +43,13 @@
     </div>
   </div>
 
-  <!-- Include Scripts -->
+  <!-- Include Gesture Drawing Script (from freestyle) -->
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+  <script src="/script.js"></script>
+  <!-- Singleplayer logic for prompts/timer/AI -->
   <script src="scripts/singleplayer.js"></script>
 </body>
 </html>
