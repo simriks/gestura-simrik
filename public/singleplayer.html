@@ -7,39 +7,52 @@
   <link rel="stylesheet" href="styles.css">
 </head>
 <body class="game-page">
-  <div class="container">
-    <!-- Header -->
-    <header>
-      <h1>Single-Player AI Guessing Game</h1>
-      <p>Draw based on a prompt, and let the AI guess!</p>
-    </header>
-
-    <!-- Prompt Selection -->
-    <div class="prompt-container">
+  <!-- Word Selection Screen -->
+  <div id="wordSelectionScreen" class="word-selection-screen">
+    <div class="container">
+      <header>
+        <h1>Choose a Word to Draw!</h1>
+        <p>Select one of the options below</p>
+      </header>
       <div class="prompt-options" id="promptOptions">
         <!-- Prompts will be dynamically inserted here -->
       </div>
-      <div class="timer" id="timer">
-        Time: <span id="timeLeft">30</span>s
+    </div>
+  </div>
+
+  <!-- Drawing Screen (Initially Hidden) -->
+  <div id="drawingScreen" class="drawing-screen" style="display: none;">
+    <div class="container">
+      <!-- Header -->
+      <header>
+        <h1>Single-Player AI Guessing Game</h1>
+        <p>Draw based on a prompt, and let the AI guess!</p>
+      </header>
+
+      <!-- Current Word Display -->
+      <div class="prompt-container">
+        <div class="timer" id="timer">
+          Time: <span id="timeLeft">30</span>s
+        </div>
+        <div class="current-prompt" id="currentPrompt">
+          <!-- Selected prompt will be shown here -->
+        </div>
       </div>
-      <div class="current-prompt" id="currentPrompt">
-        <!-- Selected prompt will be shown here -->
+
+      <!-- Canvas Section -->
+      <div class="canvas-section">
+        <canvas id="drawingCanvas" width="800" height="600"></canvas>
       </div>
-    </div>
 
-    <!-- Canvas Section -->
-    <div class="canvas-section">
-      <canvas id="drawingCanvas" width="800" height="600"></canvas>
-    </div>
+      <!-- Webcam Section -->
+      <div class="webcam-section">
+        <video id="webcam" autoplay playsinline></video>
+      </div>
 
-    <!-- Webcam Section -->
-    <div class="webcam-section">
-      <video id="webcam" autoplay playsinline></video>
-    </div>
-
-    <!-- AI Response Section -->
-    <div class="ai-response" id="aiResponse">
-      <!-- AI's guess will appear here -->
+      <!-- AI Response Section -->
+      <div class="ai-response" id="aiResponse">
+        <!-- AI's guess will appear here -->
+      </div>
     </div>
   </div>
 

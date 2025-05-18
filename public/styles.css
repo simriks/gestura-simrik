@@ -372,3 +372,78 @@ header p {
   50% { opacity: 1; }
   100% { opacity: 0.6; }
 }
+
+/* Word Selection Screen */
+.word-selection-screen {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.95);
+  z-index: 2000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.word-selection-screen .container {
+  text-align: center;
+  padding: 40px;
+  border-radius: 20px;
+  background: white;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  width: 90%;
+}
+
+.word-selection-screen header {
+  margin-bottom: 40px;
+}
+
+.word-selection-screen h1 {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  margin-bottom: 15px;
+  background: linear-gradient(45deg, #2c3e50, #3498db);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.word-selection-screen p {
+  font-size: 1.2rem;
+  color: #666;
+  margin-top: 10px;
+}
+
+.word-selection-screen .prompt-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 20px;
+  padding: 20px;
+}
+
+.word-selection-screen .prompt-option {
+  padding: 15px 25px;
+  font-size: 1.2rem;
+  background: white;
+  border: 2px solid #3498db;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.word-selection-screen .prompt-option:hover {
+  background: #3498db;
+  color: white;
+  transform: translateY(-3px);
+  box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
+}
+
+/* Drawing Screen */
+.drawing-screen {
+  position: relative;
+  min-height: 100vh;
+}

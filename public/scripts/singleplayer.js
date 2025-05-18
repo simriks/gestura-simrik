@@ -13,10 +13,29 @@ let countdownActive = false;
 // Initialize the game
 async function initGame() {
     try {
+        // Reset game state
+        selectedPrompt = '';
+        isDrawing = false;
+        countdownActive = false;
+        clearInterval(timerInterval);
+        
         // Reset canvas
         const canvas = document.getElementById('drawingCanvas');
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Show word selection screen, hide drawing screen
+        document.getElementById('wordSelectionScreen').style.display = 'flex';
+        document.getElementById('drawingScreen').style.display = 'none';
+        
+        // Hide timer and current prompt
+        document.getElementById('timer').style.display = 'none';
+        document.getElementById('currentPrompt').style.display = 'none';
+        
+        // Hide AI response
+        const aiResponse = document.getElementById('aiResponse');
+        aiResponse.innerHTML = '';
+        aiResponse.classList.remove('show');
         
         // Get AI-generated prompts
         const response = await fetch(`${API_URL}/api/prompts`);
@@ -41,19 +60,7 @@ async function initGame() {
             button.onclick = () => selectPrompt(promptText);
             promptOptionsDiv.appendChild(button);
         });
-
-        // Hide timer and current prompt
-        document.getElementById('timer').style.display = 'none';
-        document.getElementById('currentPrompt').style.display = 'none';
         
-        // Hide AI response
-        const aiResponse = document.getElementById('aiResponse');
-        aiResponse.innerHTML = '';
-        aiResponse.classList.remove('show');
-        
-        // Reset drawing state
-        isDrawing = false;
-        countdownActive = false;
     } catch (error) {
         console.error('Error initializing game:', error);
         const promptOptionsDiv = document.getElementById('promptOptions');
@@ -65,11 +72,11 @@ async function initGame() {
 function selectPrompt(prompt) {
     selectedPrompt = prompt;
     
-    // Update UI
-    document.querySelectorAll('.prompt-option').forEach(btn => {
-        btn.style.display = 'none';
-    });
+    // Hide word selection screen, show drawing screen
+    document.getElementById('wordSelectionScreen').style.display = 'none';
+    document.getElementById('drawingScreen').style.display = 'block';
     
+    // Update UI
     document.getElementById('currentPrompt').textContent = `Draw: ${prompt}`;
     document.getElementById('currentPrompt').style.display = 'block';
     document.getElementById('timer').style.display = 'block';
@@ -199,12 +206,12 @@ function displayAIResponse(response) {
     `;
 }
 
-// Initialize the game when the page loads
-window.onload = initGame;
-
 // Prevent drawing before prompt selection and during countdown
 const originalOnResults = window.onResults;
 window.onResults = function(results) {
     if (!isDrawing || countdownActive) return;
     originalOnResults(results);
-}; 
+};
+
+// Initialize the game when the page loads
+window.onload = initGame; 
