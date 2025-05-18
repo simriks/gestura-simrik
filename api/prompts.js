@@ -1,7 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize Gemini with API version
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND');
+// Initialize Gemini with explicit API endpoint
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND', {
+    apiEndpoint: 'https://generativelanguage.googleapis.com/v1'
+});
 
 // This is the format Vercel expects
 export const config = {
@@ -29,24 +31,12 @@ export default async function handler(req) {
 
         // Get the Gemini Pro model
         const model = genAI.getGenerativeModel({ 
-            model: "gemini-pro",
-            generationConfig: {
-                temperature: 0.9,
-                maxOutputTokens: 100,
-            }
+            model: "gemini-pro"
         });
 
         try {
-            // Simple test call to Gemini
-            const prompt = {
-                contents: [{
-                    parts: [{
-                        text: "Generate 5 simple drawing prompts. Return them as a JSON array of strings."
-                    }]
-                }]
-            };
-
-            const result = await model.generateContent(prompt);
+            // Simple test call to Gemini with minimal prompt
+            const result = await model.generateContent("Return a JSON array of 5 drawing prompts");
             const response = await result.response;
             const text = response.text();
             
@@ -81,7 +71,8 @@ export default async function handler(req) {
                 error: 'Failed to generate prompts',
                 details: error.message,
                 apiKeyPresent: !!process.env.GOOGLE_API_KEY,
-                apiKeyValue: process.env.GOOGLE_API_KEY ? 'Key exists but hidden' : 'No key found'
+                apiKeyValue: process.env.GOOGLE_API_KEY ? 'Key exists but hidden' : 'No key found',
+                endpoint: 'Using v1 endpoint'
             }),
             { 
                 headers, 
