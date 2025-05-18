@@ -1,7 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND');
+// Initialize Gemini with API version
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND', {
+    apiVersion: 'v1'
+});
 
 // This is the format Vercel expects
 export const config = {
@@ -46,26 +48,39 @@ export default async function handler(req) {
         // Convert base64 to Uint8Array
         const imageData = Uint8Array.from(atob(base64Image), c => c.charCodeAt(0));
 
-        // Get the Gemini Pro Vision model with correct model name
-        const model = genAI.getGenerativeModel({ model: "gemini-pro-vision" });
-
-        const result = await model.generateContent([
-            {
-                text: `You are analyzing a drawing in a fun drawing game. The user was asked to draw: "${prompt}". 
-                       Analyze the drawing and respond in this exact JSON format:
-                       {
-                           "guess": "what you think the drawing represents",
-                           "confidence": 0.0-1.0 (how confident you are in your guess),
-                           "explanation": "your encouraging feedback about the drawing"
-                       }`
-            },
-            {
-                inlineData: {
-                    mimeType: "image/png",
-                    data: Buffer.from(imageData).toString('base64')
-                }
+        // Get the Gemini Pro Vision model
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-pro-vision",
+            generationConfig: {
+                temperature: 0.7,
+                maxOutputTokens: 200,
             }
-        ]);
+        });
+
+        const result = await model.generateContent({
+            contents: [
+                {
+                    role: 'user',
+                    parts: [
+                        {
+                            text: `You are analyzing a drawing in a fun drawing game. The user was asked to draw: "${prompt}". 
+                                   Analyze the drawing and respond in this exact JSON format:
+                                   {
+                                       "guess": "what you think the drawing represents",
+                                       "confidence": 0.0-1.0 (how confident you are in your guess),
+                                       "explanation": "your encouraging feedback about the drawing"
+                                   }`
+                        },
+                        {
+                            inlineData: {
+                                mimeType: "image/png",
+                                data: Buffer.from(imageData).toString('base64')
+                            }
+                        }
+                    ]
+                }
+            ]
+        });
 
         const response = await result.response;
         const text = response.text();

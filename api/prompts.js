@@ -1,7 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
-// Initialize Gemini
-const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND');
+// Initialize Gemini with API version
+const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND', {
+    apiVersion: 'v1'
+});
 
 // This is the format Vercel expects
 export const config = {
@@ -27,12 +29,20 @@ export default async function handler(req) {
             throw new Error('GOOGLE_API_KEY has default value, not properly set');
         }
 
-        // Get the Gemini Pro model with correct model name
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        // Get the Gemini Pro model
+        const model = genAI.getGenerativeModel({ 
+            model: "gemini-pro",
+            generationConfig: {
+                temperature: 0.9,
+                maxOutputTokens: 100,
+            }
+        });
 
         try {
             // Simple test call to Gemini
-            const result = await model.generateContent("Return exactly this array: ['test prompt 1', 'test prompt 2']");
+            const result = await model.generateContent({
+                contents: [{ text: "Generate 5 simple drawing prompts. Return them as a JSON array of strings." }]
+            });
             const response = await result.response;
             const text = response.text();
             
