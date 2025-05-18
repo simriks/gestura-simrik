@@ -2,7 +2,10 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize Gemini with explicit API endpoint
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY || 'NO_KEY_FOUND', {
-    apiEndpoint: 'https://generativelanguage.googleapis.com/v1'
+    // Original v1 endpoint
+    // apiEndpoint: 'https://generativelanguage.googleapis.com/v1'
+    // Testing beta endpoint
+    apiEndpoint: 'https://generativelanguage.googleapis.com/v1beta'
 });
 
 // This is the format Vercel expects
@@ -72,7 +75,7 @@ export default async function handler(req) {
                 details: error.message,
                 apiKeyPresent: !!process.env.GOOGLE_API_KEY,
                 apiKeyValue: process.env.GOOGLE_API_KEY ? 'Key exists but hidden' : 'No key found',
-                endpoint: 'Using v1 endpoint'
+                endpoint: 'Using v1beta endpoint'
             }),
             { 
                 headers, 
