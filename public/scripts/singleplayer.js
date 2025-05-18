@@ -26,6 +26,24 @@ async function initGame() {
         const ctx = canvas.getContext('2d');
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
+        // Reset webcam
+        const webcam = document.getElementById('webcam');
+        const frozenFrame = webcam.parentNode.querySelector('img');
+        if (frozenFrame) {
+            frozenFrame.remove();
+        }
+        webcam.style.display = 'block';
+        
+        // Restart webcam if needed
+        if (!webcam.srcObject) {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                webcam.srcObject = stream;
+            } catch (err) {
+                console.error('Error accessing webcam:', err);
+            }
+        }
+        
         // Show word selection screen, hide drawing screen
         document.getElementById('wordSelectionScreen').style.display = 'flex';
         document.getElementById('drawingScreen').style.display = 'none';
@@ -138,6 +156,31 @@ function startTimer() {
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
             isGameEnded = true; // Set game ended flag
+            
+            // Freeze the webcam feed
+            const webcam = document.getElementById('webcam');
+            const canvas = document.createElement('canvas');
+            canvas.width = webcam.videoWidth;
+            canvas.height = webcam.videoHeight;
+            canvas.getContext('2d').drawImage(webcam, 0, 0);
+            
+            // Create an img element with the frozen frame
+            const frozenFrame = document.createElement('img');
+            frozenFrame.src = canvas.toDataURL();
+            frozenFrame.style.width = '100%';
+            frozenFrame.style.height = 'auto';
+            frozenFrame.style.borderRadius = '10px';
+            
+            // Replace video with frozen frame
+            webcam.style.display = 'none';
+            webcam.parentNode.insertBefore(frozenFrame, webcam);
+            
+            // Stop the webcam stream
+            if (webcam.srcObject) {
+                const tracks = webcam.srcObject.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+            
             showTimeUpMessage();
             setTimeout(() => {
                 endGame();
