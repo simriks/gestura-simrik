@@ -41,10 +41,10 @@ body {
   top: -7.5%;
   left: 50%;
   transform: translateX(-50%);
-  width: 100%;
-  max-width: 700px;
-  height: 115%;
-  object-fit: cover;
+  width: 90%;
+  max-width: 600px;
+  height: auto;
+  object-fit: contain;
   z-index: 0;
   opacity: 0.9;
 }
