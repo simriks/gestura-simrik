@@ -41,7 +41,7 @@ export default async function handler(req) {
             console.log('Model connection test successful');
 
             // Now proceed with the actual prompt
-            const result = await model.generateContent("Return a JSON array of 5 drawing prompts");
+            const result = await model.generateContent("Return a JSON array of 5 simple, easily drawable, single English words. Only return the array, no extra text or details. Examples: 'phone', 'wallet', 'pie', 'cat', 'tree'.");
             const response = await result.response;
             const text = response.text();
             
