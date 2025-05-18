@@ -12,13 +12,10 @@
       min-height: 600px;
     }
     
-    .artmode-page .canvas-section,
-    .artmode-page .result-section {
-      top: 200px; /* Same vertical position for both */
-    }
-    
     .artmode-page .canvas-section {
-      left: 20px; /* Left edge */
+      position: absolute;
+      top: 0;
+      left: 20px;
       right: auto;
       width: 600px;  /* Original canvas width */
       height: 600px; /* Original canvas height */
@@ -29,8 +26,10 @@
     }
     
     .artmode-page .result-section {
-      right: 20px; /* Right edge */
+      position: absolute;
+      right: -700px;
       left: auto;
+      top: 0;
       width: 600px;  /* Matching original width */
       height: 600px; /* Matching original height */
       background: white;
