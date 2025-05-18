@@ -8,63 +8,36 @@
   <style>
     /* Temporary debug styles - can remove after layout is fixed */
     .artmode-page .split-view {
-      border: 2px dashed red;
-      min-height: 600px; /* Ensure minimum height */
+      position: relative;
+      min-height: 600px;
     }
-    .artmode-page .canvas-section,
-    .artmode-page .result-section {
-      border: 2px dashed blue;
-      flex: 1;
-    }
-    .artmode-page #webcam {
+    .artmode-page .canvas-section {
       position: absolute;
-      bottom: 20px;
-      right: 20px;
-      width: 160px;
-      height: 120px;
-      border-radius: 8px;
-      transform: scaleX(-1);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-    /* Artmode-specific layout */
-    .artmode-page .split-view {
-      display: flex;
-      justify-content: flex-start;
-      gap: 2rem;
-      width: 100%;
-      max-width: 1600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    
-    .artmode-page .canvas-section,
-    .artmode-page .result-section {
-      flex: 1;
-      min-width: 0; /* Prevent overflow */
-      max-width: calc(50% - 1rem); /* Half width minus half gap */
+      left: 50px;  /* Adjust as needed */
+      top: 0;
+      width: 45%;  /* Adjust width as needed */
       background: white;
       border-radius: 10px;
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       padding: 20px;
       height: 600px;
-      overflow: hidden; /* Prevent content spill */
     }
-    
-    .artmode-page #drawingCanvas {
+    .artmode-page .result-section {
+      position: absolute;
+      right: 50px;  /* Adjust as needed */
+      top: 0;
+      width: 45%;   /* Adjust width as needed */
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      padding: 20px;
+      height: 600px;
+    }
+    .artmode-page #drawingCanvas,
+    .artmode-page #aiArtDisplay {
       width: 100% !important;
       height: 100% !important;
-      background: white;
     }
-    
-    .artmode-page #aiArtDisplay {
-      width: 100%;
-      height: 100%;
-      background: white;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-    }
-    
     .artmode-page #webcam {
       position: absolute;
       bottom: 20px;
@@ -74,13 +47,6 @@
       border-radius: 8px;
       transform: scaleX(-1);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    }
-
-    /* Add this new rule */
-    .artmode-page .canvas-section {
-      margin-right: 200px;  /* Creates space on the right */
-      margin-left: -250px;  /* Pulls it hard left */
-      position: relative;   /* Allows negative margins to work */     
     }
   </style>
 </head>
