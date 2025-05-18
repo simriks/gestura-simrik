@@ -3,13 +3,25 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
-export default async function handler(req, res) {
+export default async function handler(req) {
     // Enable CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET');
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'GET, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    };
+
+    // Handle preflight request
+    if (req.method === 'OPTIONS') {
+        return new Response(null, { headers, status: 200 });
+    }
     
     if (req.method !== 'GET') {
-        return res.status(405).json({ error: 'Method not allowed' });
+        return new Response(
+            JSON.stringify({ error: 'Method not allowed' }), 
+            { headers, status: 405 }
+        );
     }
 
     try {
@@ -23,7 +35,6 @@ export default async function handler(req, res) {
         const text = response.text();
 
         // Parse the response text to get the array of prompts
-        // The response might include markdown or extra text, so we'll extract just the JSON array
         const promptsMatch = text.match(/\[.*\]/s);
         if (!promptsMatch) {
             throw new Error('Invalid response format');
@@ -31,9 +42,15 @@ export default async function handler(req, res) {
 
         const prompts = JSON.parse(promptsMatch[0]);
         
-        return res.status(200).json(prompts);
+        return new Response(
+            JSON.stringify(prompts),
+            { headers, status: 200 }
+        );
     } catch (error) {
         console.error('Error generating prompts:', error);
-        return res.status(500).json({ error: 'Failed to generate prompts' });
+        return new Response(
+            JSON.stringify({ error: 'Failed to generate prompts' }),
+            { headers, status: 500 }
+        );
     }
 } 

@@ -3,26 +3,36 @@ import { GoogleGenerativeAI } from '@google/generative-ai';
 // Initialize Gemini
 const genAI = new GoogleGenerativeAI(process.env.GOOGLE_API_KEY);
 
-export default async function handler(req, res) {
+export default async function handler(req) {
     // Enable CORS
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'POST');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+    const headers = {
+        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Methods': 'POST, OPTIONS',
+        'Access-Control-Allow-Headers': 'Content-Type',
+        'Content-Type': 'application/json'
+    };
 
     // Handle preflight request
     if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+        return new Response(null, { headers, status: 200 });
     }
     
     if (req.method !== 'POST') {
-        return res.status(405).json({ error: 'Method not allowed' });
+        return new Response(
+            JSON.stringify({ error: 'Method not allowed' }),
+            { headers, status: 405 }
+        );
     }
 
     try {
-        const { image, prompt } = req.body;
+        const body = await req.json();
+        const { image, prompt } = body;
 
         if (!image || !prompt) {
-            return res.status(400).json({ error: 'Missing image or prompt' });
+            return new Response(
+                JSON.stringify({ error: 'Missing image or prompt' }),
+                { headers, status: 400 }
+            );
         }
 
         // Remove the data:image/png;base64, prefix if it exists
@@ -58,17 +68,26 @@ export default async function handler(req, res) {
         // Try to parse the response as JSON
         try {
             const analysis = JSON.parse(text);
-            return res.status(200).json(analysis);
+            return new Response(
+                JSON.stringify(analysis),
+                { headers, status: 200 }
+            );
         } catch (parseError) {
             // If parsing fails, create a structured response from the text
-            return res.status(200).json({
-                guess: prompt,
-                confidence: 0.7,
-                explanation: text
-            });
+            return new Response(
+                JSON.stringify({
+                    guess: prompt,
+                    confidence: 0.7,
+                    explanation: text
+                }),
+                { headers, status: 200 }
+            );
         }
     } catch (error) {
         console.error('Error analyzing drawing:', error);
-        return res.status(500).json({ error: 'Failed to analyze drawing' });
+        return new Response(
+            JSON.stringify({ error: 'Failed to analyze drawing' }),
+            { headers, status: 500 }
+        );
     }
 } 
