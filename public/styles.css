@@ -557,3 +557,13 @@ header p {
   position: relative;
   min-height: 100vh;
 }
+
+/* Singleplayer-specific styles */
+#drawingScreen .canvas-section {
+  width: 95%;
+  max-width: 1400px;
+}
+
+#drawingScreen .webcam-section {
+  right: -220px;
+}
