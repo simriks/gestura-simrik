@@ -27,8 +27,8 @@ export default async function handler(req) {
             throw new Error('GOOGLE_API_KEY has default value, not properly set');
         }
 
-        // Get the Gemini Pro model
-        const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+        // Get the Gemini Pro model with correct model name
+        const model = genAI.getGenerativeModel({ model: "gemini-pro-1.0" });
 
         try {
             // Simple test call to Gemini
