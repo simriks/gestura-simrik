@@ -229,7 +229,7 @@ header p {
 .webcam-section {
   position: fixed;
   top: 50%;
-  right: 50px;
+  left: calc(45% + 510px);
   transform: translateY(-50%) scaleX(-1);
   width: 220px;
   border-radius: 10px;
