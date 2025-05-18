@@ -121,6 +121,13 @@ startDrawingCountdown();
 
 // Handle hand tracking results
 function onResults(results) {
+  // Check if game has ended (for singleplayer mode)
+  if (window.isGameEnded) {
+    drawing = false;
+    hasChangedColor = false;
+    return;
+  }
+
   if (!results.multiHandLandmarks || results.multiHandLandmarks.length === 0) {
     drawing = false;
     hasChangedColor = false;
@@ -155,7 +162,7 @@ function onResults(results) {
   const isFistGesture = 
     !indexExtended && !middleExtended && !ringExtended && !pinkyExtended && !thumbExtended;
 
-  if (isFistGesture) {
+  if (isFistGesture && !window.isGameEnded) { // Only allow clearing if game hasn't ended
     drawing = false;
     hasChangedColor = false;
     console.log('Fist Gesture Detected - Clearing Canvas');
@@ -167,10 +174,10 @@ function onResults(results) {
         startDrawingCountdown();
       }
     } else {
-      drawing = true; // Immediately start drawing if we've already shown the countdown
+      drawing = !window.isGameEnded; // Only allow drawing if game hasn't ended
     }
     hasChangedColor = false;
-  } else if (isOpenHand && !hasChangedColor) {
+  } else if (isOpenHand && !hasChangedColor && !window.isGameEnded) { // Only allow color changes if game hasn't ended
     drawing = false;
     hasChangedColor = true;
     console.log('Open Hand Gesture Detected - Changing Pen Color');
@@ -183,8 +190,8 @@ function onResults(results) {
     console.log('Unrecognized Gesture - Not Drawing');
   }
 
-  // Draw only if in drawing mode
-  if (!drawing) {
+  // Draw only if in drawing mode and game hasn't ended
+  if (!drawing || window.isGameEnded) {
     lastX = null;
     lastY = null;
     return;
@@ -224,9 +231,9 @@ function onResults(results) {
   lastY = y;
 }
 
-// Clear canvas on 'c' key press
+// Clear canvas on 'c' key press - only if game hasn't ended
 document.addEventListener('keydown', (e) => {
-  if (e.key === 'c') {
+  if (e.key === 'c' && !window.isGameEnded) {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
   }
 });
@@ -365,8 +372,9 @@ function updateColorIndicator(color) {
   `;
 }
 
-// Update the changeColor function to handle both indicator and swatches
+// Update the changeColor function to handle game ended state
 function changeColor(color) {
+  if (window.isGameEnded) return; // Don't allow color changes if game has ended
   ctx.strokeStyle = color;
   updateColorIndicator(color);
   
@@ -395,6 +403,7 @@ updateColorIndicator(ctx.strokeStyle);
 
 // Brush color and size functions
 function changeBrushSize(size) {
+  if (window.isGameEnded) return; // Don't allow brush size changes if game has ended
   ctx.lineWidth = size;
 }
 

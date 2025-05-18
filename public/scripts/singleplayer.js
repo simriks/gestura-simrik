@@ -9,6 +9,7 @@ let timeLeft = 30;
 let timerInterval = null;
 let isDrawing = false;
 let countdownActive = false;
+let isGameEnded = false; // New flag to track if game has ended
 
 // Initialize the game
 async function initGame() {
@@ -17,6 +18,7 @@ async function initGame() {
         selectedPrompt = '';
         isDrawing = false;
         countdownActive = false;
+        isGameEnded = false; // Reset game ended flag
         clearInterval(timerInterval);
         
         // Reset canvas
@@ -135,6 +137,7 @@ function startTimer() {
         
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
+            isGameEnded = true; // Set game ended flag
             showTimeUpMessage();
             setTimeout(() => {
                 endGame();
@@ -242,6 +245,9 @@ window.onResults = function(results) {
     if (!isDrawing || countdownActive) return;
     originalOnResults(results);
 };
+
+// Export the isGameEnded flag for script.js to use
+window.isGameEnded = isGameEnded;
 
 // Initialize the game when the page loads
 window.onload = initGame; 
